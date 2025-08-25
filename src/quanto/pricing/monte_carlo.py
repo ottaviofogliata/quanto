@@ -1,4 +1,6 @@
-"""Monte Carlo option pricing with optional torch MPS."""
+"""Monte Carlo option pricing with optional torch MPS.
+
+Uses antithetic variates to reduce variance when sampling."""
 
 from __future__ import annotations
 
@@ -51,13 +53,21 @@ def price(ticker: str, dte: int, strike: str, cfg) -> Dict[str, float]:
     use_torch = device == "mps" and torch is not None
     if use_torch:
         tw = TorchWrapper(device)
-        z = tw.randn(paths)
+        half = paths // 2
+        z_half = tw.randn(half)
+        z = torch.cat([z_half, -z_half])
+        if paths % 2:
+            z = torch.cat([z, tw.randn(1)])
         ST = S0 * tw.exp((r - 0.5 * sigma**2) * T + sigma * math.sqrt(T) * z)
         payoff = torch.clamp(ST - K, min=0.0)
         price = tw.mean(payoff) * math.exp(-r * T)
         price = float(price.cpu().numpy())
     else:
-        z = np.random.randn(paths)
+        half = paths // 2
+        z_half = np.random.randn(half)
+        z = np.concatenate([z_half, -z_half])
+        if paths % 2:
+            z = np.append(z, np.random.randn(1))
         ST = S0 * np.exp((r - 0.5 * sigma**2) * T + sigma * math.sqrt(T) * z)
         payoff = np.maximum(ST - K, 0.0)
         price = payoff.mean() * math.exp(-r * T)
