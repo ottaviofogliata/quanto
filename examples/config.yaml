@@ -1,0 +1,52 @@
+experiment:
+  name: qsors_spy_puts_v1
+  universe: [SPY, QQQ, IWM, HYG, GLD]
+  dte_days: [14, 21, 30, 45, 60]
+  strike_grid: ["-5%", "-10%", "ATM", "+5%"]
+  costs:
+    commission_per_contract: 0.65
+    slippage_bps: 5
+  risk_free_source: "SOFR"
+  pricing:
+    classical:
+      mc_paths: 200000
+      model: "lognormal"
+      device: "auto"          # "cpu" | "mps" | "auto"
+      antithetic: true
+      control_variate: "delta"
+    quantum:
+      engine: "QAE"
+      shots: 8192
+      ansatz: "two_local"
+      state_encoding: "lognormal"
+  objective:
+    target: "EV_minus_lambda_CVaR"
+    lambda: 0.5
+    pop_min: 0.55
+    ev_min_per_contract: 3.0
+  constraints:
+    budget: 25000
+    max_positions: 8
+    max_abs_delta: 0.25
+    max_daily_theta: 0.004
+  optimizer:
+    method_primary: "QAOA_simulated"
+    method_baseline: "MILP"
+    qaoa:
+      p_layers: 2
+      optimizer: "COBYLA"
+      max_iter: 200
+  execution:
+    order_type: "limit_mid_minus_1tick"
+    time_in_force: "DAY"
+  exits:
+    time_stop_days: 10
+    profit_target_pct: 40
+    max_loss_pct: 50
+    roll_on_iv_percentile: 85
+  backtest:
+    walk_forward:
+      train_days: 252
+      test_days: 63
+    validation: "purged_kfold"
+    embargo_days: 5
