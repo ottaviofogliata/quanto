@@ -17,6 +17,7 @@ rich = "^13.7"
 typing-extensions = "^4.9"
 tqdm = "^4.66"
 typer = {version = "^0.9", extras = ["all"]}
+yfinance = "^0.2"
 cvxpy = {version = "^1.4", optional = true}
 vectorbt-lite = {version = "^0.18", optional = true}
 
