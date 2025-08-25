@@ -1,5 +1,5 @@
 experiment:
-  name: qsors_spy_puts_v1
+  name: quanto_spy_puts_v1
   universe: [SPY, QQQ, IWM, HYG, GLD]
   dte_days: [14, 21, 30, 45, 60]
   strike_grid: ["-5%", "-10%", "ATM", "+5%"]

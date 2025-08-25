@@ -1,4 +1,4 @@
-from qsors.config import load_config
+from quanto.config import load_config
 
 
 def test_load_config(tmp_path):

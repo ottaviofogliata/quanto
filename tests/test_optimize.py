@@ -1,5 +1,5 @@
-from qsors.optimize import milp, qaoa
-from qsors.config import ExperimentConfig
+from quanto.optimize import milp, qaoa
+from quanto.config import ExperimentConfig
 
 CFG = ExperimentConfig.model_validate({"experiment": {"constraints": {"budget": 1500}}})
 

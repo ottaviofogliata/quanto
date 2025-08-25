@@ -1,4 +1,4 @@
-# QSORS
+# Quanto
 
 Experimental options-trading laboratory for classical vs quantum-simulated methods.
 
@@ -7,7 +7,7 @@ Experimental options-trading laboratory for classical vs quantum-simulated metho
 ```bash
 # clone repository
 poetry install --with dev
-poetry run qsors --help
+poetry run quanto --help
 ```
 
 Optional features:

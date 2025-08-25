@@ -1,5 +1,5 @@
 import pytest
-from qsors.portfolio.hilbert import HilbertPortfolio
+from quanto.portfolio.hilbert import HilbertPortfolio
 
 np = pytest.importorskip("numpy")
 
