@@ -1,8 +1,8 @@
-"""Simulated QAOA optimizer stub."""
+"""QAOA portfolio optimizer with annealing fallback."""
 
 from __future__ import annotations
 
-from typing import Dict
+from typing import Any, Dict
 
 try:
     import numpy as np
@@ -14,16 +14,16 @@ from ..utils.logging import get_logger
 logger = get_logger(__name__)
 
 try:  # optional quantum packages
-    from qiskit_optimization.algorithms import MinimumEigenOptimizer
-    from qiskit_optimization.applications import PortfolioOptimization
-    from qiskit.algorithms.optimizers import COBYLA
-    from qiskit.primitives import Sampler
-    from qiskit.algorithms import QAOA
+    from qiskit_optimization import QuadraticProgram  # type: ignore[import-untyped]
+    from qiskit_optimization.algorithms import MinimumEigenOptimizer  # type: ignore[import-untyped]
+    from qiskit_algorithms.optimizers import COBYLA  # type: ignore[import-untyped]
+    from qiskit_algorithms.minimum_eigensolvers import QAOA  # type: ignore[import-untyped]
+    from qiskit.primitives import Sampler  # type: ignore[import-untyped]
 except Exception:  # pragma: no cover
     MinimumEigenOptimizer = None  # type: ignore
 
 
-def optimize(cfg) -> Dict[str, float]:
+def optimize(cfg) -> Dict[str, Any]:
     """Run a toy QAOA optimization or annealing fallback."""
     if MinimumEigenOptimizer is None or np is None:
         logger.warning("QAOA unavailable; using simulated annealing fallback")
@@ -46,16 +46,19 @@ def optimize(cfg) -> Dict[str, float]:
         selection = [i for i, v in enumerate(x) if v > 0.5]
         return {"selection": selection, "method": "annealing"}
     # simple QAOA portfolio optimization
-    profits = [5, 4, 3]
-    costs = [1000, 800, 500]
+    assert np is not None
+    profits = [5.0, 4.0, 3.0]
+    costs = [1000.0, 800.0, 500.0]
     budget = cfg.experiment["constraints"]["budget"]
-    mu = profits
-    sigma = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    q = PortfolioOptimization(mu, sigma, budget)
-    qp = q.to_quadratic_program()
+    qp = QuadraticProgram()
+    for i in range(len(profits)):
+        qp.binary_var(name=f"x{i}")
+    qp.maximize(linear=profits)
+    qp.linear_constraint(linear=costs, sense="<=", rhs=float(budget), name="budget")
     sampler = Sampler()
-    qaoa = QAOA(sampler, reps=1, optimizer=COBYLA())
+    qaoa = QAOA(sampler=sampler, reps=1, optimizer=COBYLA(maxiter=5))
     optimizer = MinimumEigenOptimizer(qaoa)
     res = optimizer.solve(qp)
+    assert res.x is not None
     selection = [i for i, v in enumerate(res.x) if v > 0.5]
     return {"selection": selection, "method": "qaoa"}

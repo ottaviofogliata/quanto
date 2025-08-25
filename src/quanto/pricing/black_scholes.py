@@ -52,4 +52,11 @@ def price_european(
     rho = (
         K * T * math.exp(-r * T) * norm.cdf(d2 if option_type == "call" else -d2) / 100
     )
-    return BSResult(price, delta, gamma, theta, vega, rho)
+    return BSResult(
+        float(price),
+        float(delta),
+        float(gamma),
+        float(theta),
+        float(vega),
+        float(rho),
+    )

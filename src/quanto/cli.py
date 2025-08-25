@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 
 import typer
+import numpy as np
 
 from .config import load_config
 from .pricing import monte_carlo, quantum_qae
@@ -51,11 +52,14 @@ def backtest(
     source: str = typer.Option("random", help="real|random"),
     mu: float = typer.Option(0.0, help="Mean for random.gauss"),
     sigma: float = typer.Option(0.01, help="Std dev for random.gauss"),
+    method: str = typer.Option("classical", help="classical|quantum"),
 ) -> None:
     cfg = load_config(config)
     from .backtest.engine import run_backtest
 
-    summary = run_backtest(cfg, source=source, ticker=ticker, mu=mu, sigma=sigma)
+    summary = run_backtest(
+        cfg, source=source, ticker=ticker, mu=mu, sigma=sigma, method=method
+    )
     typer.echo(json.dumps(summary, indent=2))
 
 
@@ -65,7 +69,7 @@ def hilbert_demo(
 ) -> None:
     cfg = load_config(config)
     basis = cfg.experiment["universe"]
-    amps = [1.0 / len(basis)] * len(basis)
+    amps = np.full(len(basis), 1.0 / len(basis))
     portfolio = hilbert.HilbertPortfolio(basis, amps)
     typer.echo(portfolio.pretty())
 

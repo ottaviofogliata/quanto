@@ -5,6 +5,8 @@ description = "Experimental options trading lab comparing classical vs quantum-s
 authors = ["OpenAI Assistant <assistant@example.com>"]
 readme = "README.md"
 license = "MIT"
+packages = [{include = "quanto", from = "src"}]
+include = ["src/quanto/py.typed"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -16,17 +18,19 @@ pydantic = "^2.6"
 rich = "^13.7"
 typing-extensions = "^4.9"
 tqdm = "^4.66"
+click = ">=8,<8.2"
 typer = {version = "^0.9", extras = ["all"]}
 yfinance = "^0.2"
 cvxpy = {version = "^1.4", optional = true}
 vectorbt-lite = {version = "^0.18", optional = true}
 qiskit = {version = "~0.45", optional = true}
 qiskit-optimization = {version = "~0.6", optional = true}
+qiskit-algorithms = {version = "~0.3", optional = true}
 pennylane = {version = "~0.34", optional = true}
 torch = {version = ">=2,<3", optional = true}
 
 [tool.poetry.extras]
-quantum = ["qiskit", "qiskit-optimization", "pennylane"]
+quantum = ["qiskit", "qiskit-algorithms", "qiskit-optimization", "pennylane"]
 gpu = ["torch"]
 classical = ["cvxpy", "vectorbt-lite"]
 
@@ -36,6 +40,8 @@ ruff = "^0.1.15"
 black = "^24.1"
 mypy = "^1.8"
 pre-commit = "^3.7"
+scipy-stubs = "^1.16"
+types-PyYAML = "^6.0"
 
 [tool.poetry.scripts]
 quanto = "quanto.cli:app"

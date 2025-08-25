@@ -15,7 +15,7 @@ from ..utils.logging import get_logger
 logger = get_logger(__name__)
 
 try:  # torch optional
-    import torch
+    import torch  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover
     torch = None  # type: ignore
 
@@ -39,7 +39,7 @@ class TorchWrapper:
         return t.cpu().numpy()
 
 
-def price(ticker: str, dte: int, strike: str, cfg) -> Dict[str, float]:
+def price(ticker: str, dte: int, strike: str, cfg) -> Dict[str, float | str]:
     """Price an option via Monte Carlo."""
     manual_seed(0)
     S0 = 100.0
