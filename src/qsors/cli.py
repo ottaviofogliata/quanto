@@ -47,11 +47,15 @@ def optimize(
 @app.command()
 def backtest(
     config: Path = typer.Option(Path("examples/config.yaml")),
+    ticker: str = typer.Option("SPY", help="Ticker symbol to backtest"),
+    source: str = typer.Option("random", help="real|random"),
+    mu: float = typer.Option(0.0, help="Mean for random.gauss"),
+    sigma: float = typer.Option(0.01, help="Std dev for random.gauss"),
 ) -> None:
     cfg = load_config(config)
     from .backtest.engine import run_backtest
 
-    summary = run_backtest(cfg)
+    summary = run_backtest(cfg, source=source, ticker=ticker, mu=mu, sigma=sigma)
     typer.echo(json.dumps(summary, indent=2))
 
 
