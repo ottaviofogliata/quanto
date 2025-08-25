@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional
 
 try:
-    import torch
+    import torch  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover - torch optional
     torch = None  # type: ignore
 

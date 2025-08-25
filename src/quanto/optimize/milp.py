@@ -2,19 +2,19 @@
 
 from __future__ import annotations
 
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from ..utils.logging import get_logger
 
 logger = get_logger(__name__)
 
 try:  # cvxpy optional
-    import cvxpy as cp
+    import cvxpy as cp  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover
     cp = None  # type: ignore
 
 
-def optimize(cfg) -> Dict[str, float]:
+def optimize(cfg) -> Dict[str, Any]:
     """Simple MILP selecting contracts by EV subject to budget."""
     if cp is None:
         logger.warning("cvxpy unavailable; using greedy fallback")

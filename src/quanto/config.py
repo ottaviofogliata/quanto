@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 try:
-    import yaml
+    import yaml  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover
     yaml = None  # type: ignore
 
@@ -34,10 +34,11 @@ class ExperimentConfig(BaseModel):
 def load_config(path: str | Path) -> ExperimentConfig:
     """Load a YAML configuration file."""
     text = Path(path).read_text()
+    data: Dict[str, Any]
     if yaml:
         data = yaml.safe_load(text)
     else:  # naive fallback for simple key: value pairs
-        data: Dict[str, Any] = {}
+        data = {}
         for line in text.splitlines():
             if ":" in line:
                 k, v = line.split(":", 1)
