@@ -2,7 +2,7 @@ import pytest
 
 pytest.importorskip("numpy")
 pytest.importorskip("scipy")
-from qsors.pricing.black_scholes import price_european
+from quanto.pricing.black_scholes import price_european
 
 
 def test_put_call_parity():

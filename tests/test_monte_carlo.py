@@ -1,8 +1,8 @@
 import pytest
 
 pytest.importorskip("numpy")
-from qsors.pricing import monte_carlo
-from qsors.config import ExperimentConfig
+from quanto.pricing import monte_carlo
+from quanto.config import ExperimentConfig
 
 
 def test_mc_price_close():

@@ -1,4 +1,4 @@
-"""Logging utilities for QSORS."""
+"""Logging utilities for Quanto."""
 
 from __future__ import annotations
 

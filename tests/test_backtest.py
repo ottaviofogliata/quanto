@@ -1,5 +1,5 @@
-from qsors.backtest.engine import run_backtest
-from qsors.config import ExperimentConfig
+from quanto.backtest.engine import run_backtest
+from quanto.config import ExperimentConfig
 
 
 def test_backtest_smoke():

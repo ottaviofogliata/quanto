@@ -1,8 +1,8 @@
 import pytest
 
 pytest.importorskip("numpy")
-from qsors.pricing import quantum_qae
-from qsors.config import ExperimentConfig
+from quanto.pricing import quantum_qae
+from quanto.config import ExperimentConfig
 
 
 def test_quantum_fallback():

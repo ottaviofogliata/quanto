@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "qsors"
+name = "quanto"
 version = "0.1.0"
 description = "Experimental options trading lab comparing classical vs quantum-simulated methods"
 authors = ["OpenAI Assistant <assistant@example.com>"]
@@ -31,6 +31,9 @@ ruff = "^0.1.15"
 black = "^24.1"
 mypy = "^1.8"
 pre-commit = "^3.7"
+
+[tool.poetry.scripts]
+quanto = "quanto.cli:app"
 
 [build-system]
 requires = ["poetry-core>=1.7.0"]
