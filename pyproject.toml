@@ -20,10 +20,15 @@ typer = {version = "^0.9", extras = ["all"]}
 yfinance = "^0.2"
 cvxpy = {version = "^1.4", optional = true}
 vectorbt-lite = {version = "^0.18", optional = true}
+qiskit = {version = "~0.45", optional = true}
+qiskit-optimization = {version = "~0.6", optional = true}
+pennylane = {version = "~0.34", optional = true}
+torch = {version = ">=2,<3", optional = true}
 
 [tool.poetry.extras]
-quantum = ["qiskit~=0.45", "qiskit-optimization~=0.6", "pennylane~=0.34"]
-gpu = ["torch>=2,<3"]
+quantum = ["qiskit", "qiskit-optimization", "pennylane"]
+gpu = ["torch"]
+classical = ["cvxpy", "vectorbt-lite"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2"
