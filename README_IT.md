@@ -2,6 +2,8 @@
 
 [Versione originale in inglese](README.md)
 
+Questo README è la traduzione completa del file in inglese.
+
 Laboratorio sperimentale di trading per confrontare metodi classici e simulati quantistici su
 opzioni, azioni ed ETF.
 
@@ -66,10 +68,24 @@ Funzionalità opzionali:
 
 ## Flusso tipico
 
+Prima di eseguire i comandi, scegli la classe di asset con `--asset-class options`
+per i contratti su opzioni o `--asset-class stocks` per azioni ed ETF.
+
+```bash
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml
+# {"price": 5.624190052301251, "device": "cpu"}
+
+poetry run quanto price --asset-class stocks --ticker SPY --config examples/config.yaml
+# {"price": 500.12, "device": "cpu"}
+```
+
+In entrambi i casi, `price` rappresenta il premio dell'opzione o il prezzo
+dell'azione, mentre `device` indica il backend di calcolo.
+
 Una volta configurato l'ambiente, un ciclo di ricerca di base è il seguente:
 
 1. **Prezzare gli strumenti** per ottenere rendimenti o payoff attesi:
-   `poetry run quanto price --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
+   `poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
 2. **Ottimizzare un portafoglio** con il MILP classico o con la routine quantistica:
    `poetry run quanto optimize --method classical --config examples/config.yaml`
 3. **Backtestare la strategia** per valutarne le prestazioni storiche:
