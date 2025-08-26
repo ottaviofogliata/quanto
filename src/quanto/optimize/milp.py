@@ -14,24 +14,21 @@ try:  # cvxpy optional
 except Exception:  # pragma: no cover
     cp = None  # type: ignore
 def optimize(
-    cfg, *, asset_class: str = "options", tickers: List[str] | None = None
+    cfg, *, asset_class: str | None = None, tickers: List[str] | None = None
 ) -> Dict[str, Any]:
     """Simple MILP selecting contracts by EV subject to budget."""
 
+    exp_cfg = getattr(cfg, "experiment", {}) or {}
     if asset_class == "stocks":
-        symbols = tickers or cfg.experiment.get("universe", [])
+        symbols = tickers or exp_cfg.get("universe", [])
         if not symbols:
             raise ValueError("tickers required for stock optimization")
         try:
             fetch_prices(symbols, period="1mo", days=5)
         except Exception as exc:  # pragma: no cover - network dependent
             logger.warning(f"price fetch failed: {exc}")
-
-def optimize(cfg, asset_class: str | None = None) -> Dict[str, Any]:
-    """Simple MILP selecting contracts by EV subject to budget."""
-    exp_cfg = getattr(cfg, "experiment", {}) or {}
-    if asset_class in {"stocks", "options"} and not exp_cfg.get("universe"):
-        raise ValueError(f"Tickers required for asset_class '{asset_class}'")
+    elif asset_class == "options" and not exp_cfg.get("universe"):
+        raise ValueError("Tickers required for option optimization")
     if cp is None:
         logger.warning("cvxpy unavailable; using greedy fallback")
         ev = [5, 4, 3]

@@ -54,14 +54,13 @@ def run_backtest(
     """
 
     exp_cfg = getattr(cfg, "experiment", {}) or {}
-    if asset_class == "stocks":
-        if not ticker:
-            raise ValueError("ticker required for stock backtest")
+    universe = exp_cfg.get("universe", ["SPY"])
+    if ticker:
         tickers: List[str] = [ticker]
+    elif asset_class == "stocks":
+        tickers = [universe[0]]
     else:
-        tickers = exp_cfg.get("universe", ["SPY"])
-        if ticker:
-            tickers = [ticker]
+        tickers = universe
 
     # Determine the test window from the configuration.  Defaults to 10 days
     # if the nested keys are absent.
