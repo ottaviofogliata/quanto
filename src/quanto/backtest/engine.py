@@ -15,6 +15,7 @@ except Exception:  # pragma: no cover
     SparsePauliOp = None  # type: ignore
 
 from ..utils.logging import get_logger
+from ..data.prices import fetch_prices
 
 logger = get_logger(__name__)
 
@@ -51,65 +52,18 @@ def run_backtest(
         Algorithm used for synthetic returns when ``source="random"``.
     """
 
-    tickers: List[str] = cfg.experiment.get("universe", ["SPY"])
+    exp_cfg = getattr(cfg, "experiment", {}) or {}
+    tickers: List[str] = exp_cfg.get("universe", ["SPY"])
     if ticker:
         tickers = [ticker]
 
     # Determine the test window from the configuration.  Defaults to 10 days
     # if the nested keys are absent.
-    days = (
-        cfg.experiment.get("backtest", {})
-        .get("walk_forward", {})
-        .get("test_days", 10)
-    )
+    days = exp_cfg.get("backtest", {}).get("walk_forward", {}).get("test_days", 10)
 
     if source == "real":
         symbols: List[str] = list(dict.fromkeys(tickers + [benchmark]))
-        try:
-            # Primary data source: yfinance.  A custom session header avoids
-            # occasional HTTP 403 errors when running in CI.
-            import importlib
-            import pandas as pd
-            import requests
-
-            yf = importlib.import_module("yfinance")  # type: ignore
-            session = requests.Session()
-            session.headers["User-Agent"] = "Mozilla/5.0"
-            prices = (
-                yf.download(
-                    " ".join(symbols),
-                    period="1mo",
-                    progress=False,
-                    session=session,
-                )["Adj Close"]
-                .dropna()
-                .tail(days + 1)
-            )
-            if prices.empty:
-                raise RuntimeError("no market data returned")
-        except Exception as exc1:  # pragma: no cover - try alternate source
-            # Fall back to the stooq dataset when yfinance is unavailable.
-            print(f"yfinance download failed ({exc1}); trying stooq")
-            try:  # pragma: no cover - network dependent
-                import pandas as pd
-
-                frames = []
-                for symbol in symbols:
-                    url = f"https://stooq.pl/q/d/l/?s={symbol.lower()}.us&i=d"
-                    df = pd.read_csv(url, parse_dates=["Date"]).set_index("Date")
-                    frames.append(df["Close"].rename(symbol))
-                prices = (
-                    pd.concat(frames, axis=1)
-                    .dropna()
-                    .tail(days + 1)
-                )
-                if prices.empty:
-                    raise RuntimeError("no market data returned")
-            except Exception as exc2:  # pragma: no cover - propagate
-                raise RuntimeError(
-                    f"real data fetch failed via yfinance ({exc1}) and stooq ({exc2})",
-                )
-
+        prices = fetch_prices(symbols, period="1mo", days=days)
         strat_returns = prices[tickers[0]].pct_change().dropna().tolist()
         bench_returns = prices[benchmark].pct_change().dropna().tolist()
         days = min(len(strat_returns), len(bench_returns))
