@@ -7,7 +7,7 @@ from typing import Any, Dict
 from ast import literal_eval
 
 try:
-    import yaml  # type: ignore[import-not-found]
+    import yaml  # type: ignore[import-untyped]
 except Exception:  # pragma: no cover
     yaml = None  # type: ignore
 

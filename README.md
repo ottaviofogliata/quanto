@@ -70,6 +70,22 @@ Optional features:
 
   When absent, graceful fallbacks are used.
 
+## Typical workflow
+
+Once the environment is set up, a basic research cycle looks like this:
+
+1. **Price instruments** to obtain expected returns or payoffs:
+   `poetry run quanto price --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
+2. **Optimize a portfolio** with either the classical MILP or the quantum
+   routine:
+   `poetry run quanto optimize --method classical --config examples/config.yaml`
+3. **Backtest the strategy** to gauge historical performance:
+   `poetry run quanto backtest --config examples/config.yaml`
+
+`entangle` can optionally be run before optimization to inspect correlations
+between tickers. Adjust the configuration file between steps to experiment with
+different universes or constraints.
+
 ## Documentation
 
 The project uses [MkDocs](https://www.mkdocs.org/) for its bilingual documentation stored in the `doc/` folder. Launch a local preview with:
@@ -170,13 +186,29 @@ universe of tickers defined in `config.yaml` and searches for the combination of
 weights that best satisfies the chosen objective and any side constraints.
 
 ```bash
-poetry run quanto optimize --config examples/config.yaml
+poetry run quanto optimize --method classical --config examples/config.yaml
 ```
 
-The optimizer emits a JSON mapping tickers to weights—for example,
-`{ "SPY": 0.6, "QQQ": 0.4 }`.  Each number is the fraction of capital the
-trading strategy should allocate to that instrument, providing a concrete rule
-for constructing the portfolio.
+The `--method` flag selects the optimizer: `classical` runs a MILP baseline,
+while `quantum` maps the budgeted selection problem to a quadratic
+unconstrained binary optimization and applies a QAOA-style routine. QAOA
+alternates problem and mixing Hamiltonians in a small parameterized circuit; a
+classical optimizer tunes the angles so the circuit approximates the optimal
+portfolio. If the quantum libraries are unavailable, the command falls back to
+simulated annealing. A sample response looks like:
+
+```json
+{
+  "selection": [0, 1],
+  "method": "milp"
+}
+```
+
+`selection` lists the chosen instruments by index, and `method` records which
+optimizer generated the result.
+
+For a deeper explanation of the quantum routine, see
+[the QAOA portfolio documentation](doc/qaoa_portfolio.md).
 
 ### Backtesting the strategy
 
@@ -311,4 +343,3 @@ This project uses AI and agents extensively to automate research and development
 Guidelines for these agents are defined in [AGENTS.md](https://agents.md), a
 specification that explains how repository-specific instructions help AI
 contributors maintain consistency and quality.
-

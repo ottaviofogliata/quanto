@@ -4,5 +4,6 @@ nav:
   - Home: index.md
   - Monte Carlo: monte_carlo.md
   - Quantum Amplitude Estimation: quantum_amplitude_estimation.md
+  - QAOA Portfolio Optimization: qaoa_portfolio.md
 theme:
   name: material

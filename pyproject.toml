@@ -23,7 +23,7 @@ click = ">=8,<8.2"
 typer = {version = "^0.9", extras = ["all"]}
 yfinance = "^0.2"
 cvxpy = {version = "^1.4", optional = true}
-vectorbt-lite = {version = "^0.18", optional = true}
+vectorbt = {version = "^0.28", optional = true}
 qiskit = {version = "~0.45", optional = true}
 qiskit-optimization = {version = "~0.6", optional = true}
 qiskit-algorithms = {version = "~0.3", optional = true}
@@ -33,7 +33,7 @@ torch = {version = ">=2,<3", optional = true}
 [tool.poetry.extras]
 quantum = ["qiskit", "qiskit-algorithms", "qiskit-optimization", "pennylane"]
 gpu = ["torch"]
-classical = ["cvxpy", "vectorbt-lite"]
+classical = ["cvxpy", "vectorbt"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2"
