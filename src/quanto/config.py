@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Literal
 from ast import literal_eval
 
 try:
@@ -29,7 +29,14 @@ except Exception:  # pragma: no cover
 
 
 class ExperimentConfig(BaseModel):
-    experiment: Dict[str, Any] = Field(..., description="Experiment configuration")
+    """Top-level configuration model."""
+
+    experiment: Dict[str, Any] = Field(
+        ..., description="Experiment configuration"
+    )
+    asset_class: Literal["stocks", "options"] = Field(
+        "options", description="Asset class to operate on"
+    )
 
 
 def load_config(path: str | Path) -> ExperimentConfig:

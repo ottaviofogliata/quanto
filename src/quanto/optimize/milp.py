@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
+from ..data.prices import fetch_prices
 from ..utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -12,10 +13,20 @@ try:  # cvxpy optional
     import cvxpy as cp  # type: ignore[import-not-found]
 except Exception:  # pragma: no cover
     cp = None  # type: ignore
-
-
-def optimize(cfg) -> Dict[str, Any]:
+def optimize(
+    cfg, *, asset_class: str = "options", tickers: List[str] | None = None
+) -> Dict[str, Any]:
     """Simple MILP selecting contracts by EV subject to budget."""
+
+    if asset_class == "stocks":
+        symbols = tickers or cfg.experiment.get("universe", [])
+        if not symbols:
+            raise ValueError("tickers required for stock optimization")
+        try:
+            fetch_prices(symbols, period="1mo", days=5)
+        except Exception as exc:  # pragma: no cover - network dependent
+            logger.warning(f"price fetch failed: {exc}")
+
     if cp is None:
         logger.warning("cvxpy unavailable; using greedy fallback")
         ev = [5, 4, 3]

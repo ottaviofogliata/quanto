@@ -6,9 +6,10 @@ running commands from the repository root.  The sample configuration lives in
 `examples/config.yaml` and lists a small universe of optionable tickers.
 
 > **Note**
-> The `price` command accepts any ticker symbol.  Other commands pull their
-> tickers from the `universe` field of the configuration file unless you edit
-> it to include additional symbols.
+> The `price` command accepts any ticker symbol. For equities, pass
+> `--asset-class stocks` and provide `--tickers`. Other commands pull their
+> tickers from the `universe` field of the configuration file when
+> `--asset-class options` is used.
 
 ## Classical Monte Carlo Pricing
 
@@ -17,7 +18,7 @@ averaging the discounted payoff
 \(V_0 = e^{-rT}\,\mathbb{E}[f(S_T)]\).
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike "-5%" --method classical
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike "-5%" --method classical
 ```
 
 The JSON output shows the option price and the statistical error from the
@@ -31,7 +32,7 @@ from \(O(1/\epsilon^2)\) to \(O(1/\epsilon)\) for target error \(\epsilon\).
 Here we simulate the quantum algorithm on a classical machine.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike "-5%" --method quantum
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike "-5%" --method quantum
 ```
 
 ## Portfolio Optimization
@@ -42,7 +43,7 @@ implementation; if that is unavailable it falls back to a classical mixed
 integer linear program.
 
 ```bash
-poetry run quanto optimize
+poetry run quanto optimize --asset-class options
 ```
 
 ## Backtesting
@@ -54,7 +55,7 @@ The PnL for each step is computed as
 \(\text{PnL} = \Delta S - \text{Premium}\).
 
 ```bash
-poetry run quanto backtest --ticker SPY --benchmark SPY
+poetry run quanto backtest --asset-class options --tickers SPY --benchmark SPY
 ```
 
 ## Hilbert Curve Demo
@@ -100,7 +101,7 @@ The command below prices a SPY put option that is five percent out of the money
 pricing model draws random paths under a geometric Brownian motion assumption.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
 ```
 
 ## Pricing an option with the quantum‑simulated engine
@@ -118,7 +119,7 @@ simulation engine.  Comparing its output with the classical engine illustrates
 how quantum techniques might improve efficiency in future hardware generations.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
 ```
 
 ## Portfolio optimization
@@ -138,7 +139,7 @@ universe of tickers defined in `config.yaml` and searches for the combination of
 weights that best satisfies the chosen objective and any side constraints.
 
 ```bash
-poetry run quanto optimize --config examples/config.yaml
+poetry run quanto optimize --asset-class options --config examples/config.yaml
 ```
 
 ## Backtesting the strategy
@@ -157,7 +158,7 @@ robustness before deploying real capital.  The example command runs a backtest
 using the settings defined in the configuration file.
 
 ```bash
-poetry run quanto backtest --config examples/config.yaml
+poetry run quanto backtest --asset-class options --config examples/config.yaml
 ```
 
 ## Hilbert curve demonstration
