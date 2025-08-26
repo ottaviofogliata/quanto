@@ -41,19 +41,23 @@ class TorchWrapper:
 
 def price(ticker: str, dte: int, strike: str, cfg) -> Dict[str, float | str]:
     """Price an option via Monte Carlo."""
-    manual_seed(0)
-    S0 = 100.0
+    manual_seed(0)  # ensure reproducible runs for tests and examples
+    S0 = 100.0  # spot price placeholder
+    # Support expressions such as ``-5%`` to denote OTM strikes
     K = S0 * (1 - 0.05) if strike.startswith("-") else S0
-    r = 0.01
-    sigma = 0.2
-    T = dte / 365
+    r = 0.01  # risk-free rate
+    sigma = 0.2  # volatility
+    T = dte / 365  # convert days-to-expiry to years
     paths = cfg.experiment["pricing"]["classical"]["mc_paths"]
     device_str = cfg.experiment["pricing"]["classical"].get("device", "cpu")
     device = device_from_config(device_str)
+    # Use torch on Apple silicon when available, otherwise fall back to numpy
     use_torch = device == "mps" and torch is not None
     if use_torch:
         tw = TorchWrapper(device)
         half = paths // 2
+        # Generate half the random draws and reuse their negation for antithetic
+        # variates, reducing variance without doubling cost
         z_half = tw.randn(half)
         z = torch.cat([z_half, -z_half])
         if paths % 2:
@@ -64,6 +68,7 @@ def price(ticker: str, dte: int, strike: str, cfg) -> Dict[str, float | str]:
         price = float(price.cpu().numpy())
     else:
         half = paths // 2
+        # Same antithetic variates approach for the numpy implementation
         z_half = np.random.randn(half)
         z = np.concatenate([z_half, -z_half])
         if paths % 2:
