@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Optional
 
 import typer
 import numpy as np
@@ -25,9 +26,15 @@ def price(
     dte: int = typer.Option(..., help="Days to expiry"),
     strike: str = typer.Option(..., help="Strike expression e.g. -5%"),
     method: str = typer.Option("classical", help="classical|quantum"),
+    asset_class: Optional[str] = typer.Option(
+        None, help="Asset class, e.g. options or stocks"
+    ),
     config: Path = typer.Option(Path("examples/config.yaml")),
 ) -> None:
     cfg = load_config(config)
+    cfg.experiment["asset_class"] = asset_class or cfg.experiment.get(
+        "asset_class", "options"
+    )
     if method == "classical":
         res = monte_carlo.price(ticker, dte, strike, cfg)
     else:
@@ -39,8 +46,14 @@ def price(
 def optimize(
     config: Path = typer.Option(Path("examples/config.yaml")),
     method: str = typer.Option("quantum", help="classical|quantum"),
+    asset_class: Optional[str] = typer.Option(
+        None, help="Asset class, e.g. options or stocks"
+    ),
 ) -> None:
     cfg = load_config(config)
+    cfg.experiment["asset_class"] = asset_class or cfg.experiment.get(
+        "asset_class", "options"
+    )
     if method == "classical":
         res = milp.optimize(cfg)
     else:
@@ -59,8 +72,14 @@ def backtest(
     mu: float = typer.Option(0.0, help="Mean for random.gauss"),
     sigma: float = typer.Option(0.01, help="Std dev for random.gauss"),
     method: str = typer.Option("classical", help="classical|quantum"),
+    asset_class: Optional[str] = typer.Option(
+        None, help="Asset class, e.g. options or stocks"
+    ),
 ) -> None:
     cfg = load_config(config)
+    cfg.experiment["asset_class"] = asset_class or cfg.experiment.get(
+        "asset_class", "options"
+    )
     from .backtest.engine import run_backtest
 
     summary = run_backtest(
@@ -81,9 +100,15 @@ def entangle(
     tickers: str = typer.Option("SPY,QQQ", help="Comma-separated tickers"),
     days: int = typer.Option(252, help="Trading days to simulate"),
     source: str = typer.Option("random", help="real|random"),
+    asset_class: Optional[str] = typer.Option(
+        None, help="Asset class, e.g. options or stocks"
+    ),
 ) -> None:
     """Backtest a toy quantum-inspired entanglement between instruments."""
     cfg = load_config(config)
+    cfg.experiment["asset_class"] = asset_class or cfg.experiment.get(
+        "asset_class", "options"
+    )
     syms = [t.strip() for t in tickers.split(",") if t.strip()]
     res = run_entanglement_backtest(cfg, syms, days=days, source=source)
     typer.echo(json.dumps(res, indent=2))
@@ -92,8 +117,14 @@ def entangle(
 @app.command(name="hilbert-demo")
 def hilbert_demo(
     config: Path = typer.Option(Path("examples/config.yaml")),
+    asset_class: Optional[str] = typer.Option(
+        None, help="Asset class, e.g. options or stocks"
+    ),
 ) -> None:
     cfg = load_config(config)
+    cfg.experiment["asset_class"] = asset_class or cfg.experiment.get(
+        "asset_class", "options"
+    )
     basis = cfg.experiment["universe"]
     amps = np.full(len(basis), 1.0 / len(basis))
     portfolio = hilbert.HilbertPortfolio(basis, amps)

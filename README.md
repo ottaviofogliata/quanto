@@ -115,10 +115,11 @@ applied to option contracts or directly to stocks and ETFs depending on the
 ticker symbols supplied.
 
 The project reads its settings from a YAML configuration file—this repository
-ships an example at `examples/config.yaml`. The configuration specifies things
-like the list of option tickers to consider (the *universe*), numerical
-parameters for simulations, and where data files should be stored. Every command
-below references that file with `--config examples/config.yaml`.
+ships an example at `examples/config.yaml`. The configuration begins with an
+`asset_class` field such as `options` or `stocks`, then specifies things like the
+list of tickers to consider (the *universe*), numerical parameters for
+simulations, and where data files should be stored. Every command below
+references that file with `--config examples/config.yaml`.
 
 ### Pricing an option with the classical engine
 
