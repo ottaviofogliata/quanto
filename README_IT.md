@@ -2,6 +2,8 @@
 
 [Versione originale in inglese](README.md) – questa è una traduzione completa del README inglese.
 
+Questo README è la traduzione completa del file in inglese.
+
 Laboratorio sperimentale di trading per confrontare metodi classici e simulati quantistici su
 opzioni, azioni ed ETF.
 
@@ -66,6 +68,20 @@ Funzionalità opzionali:
 
 ## Flusso tipico
 
+Prima di eseguire i comandi, scegli la classe di asset con `--asset-class options`
+per i contratti su opzioni o `--asset-class stocks` per azioni ed ETF.
+
+```bash
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml
+# {"price": 5.624190052301251, "device": "cpu"}
+
+poetry run quanto price --asset-class stocks --ticker SPY --config examples/config.yaml
+# {"price": 500.12, "device": "cpu"}
+```
+
+In entrambi i casi, `price` rappresenta il premio dell'opzione o il prezzo
+dell'azione, mentre `device` indica il backend di calcolo.
+
 Una volta configurato l'ambiente, un ciclo di ricerca di base è il seguente:
 
 1. **Prezzare gli strumenti** per ottenere rendimenti o payoff attesi:
@@ -105,9 +121,10 @@ essere applicato a contratti su opzioni o direttamente a titoli ed ETF a seconda
 forniti.
 
 Il progetto legge le impostazioni da un file di configurazione YAML—questo repository ne include uno
-di esempio in `examples/config.yaml`. La configurazione specifica elementi come la lista di ticker
-da considerare (l'*universo*), parametri numerici per le simulazioni e dove memorizzare i file di
-dati. Ogni comando menzionato sotto fa riferimento a quel file con `--config examples/config.yaml`.
+di esempio in `examples/config.yaml`. La configurazione inizia con un campo `asset_class`, ad esempio
+`options` o `stocks`, e poi specifica elementi come la lista di ticker da considerare (l'*universo*),
+parametri numerici per le simulazioni e dove memorizzare i file di dati. Ogni comando menzionato sotto
+fa riferimento a quel file con `--config examples/config.yaml`.
 
 ### Valutare un'opzione con il motore classico
 

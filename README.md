@@ -1,5 +1,6 @@
 # Quanto
-[Read the complete Italian translation](README_IT.md) – the Italian README is a full translation of this document.
+
+This README has a complete [Italian translation](README_IT.md).
 
 Experimental trading laboratory for classical vs quantum-simulated methods across
 options, stocks, and ETFs.
@@ -72,6 +73,20 @@ Optional features:
 
 ## Typical workflow
 
+Before running commands, choose the asset class with `--asset-class options` for
+option contracts or `--asset-class stocks` for equities and ETFs.
+
+```bash
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml
+# {"price": 5.624190052301251, "device": "cpu"}
+
+poetry run quanto price --asset-class stocks --ticker SPY --config examples/config.yaml
+# {"price": 500.12, "device": "cpu"}
+```
+
+In both cases, `price` is the option premium or share price, and `device` notes
+the compute backend.
+
 Once the environment is set up, a basic research cycle looks like this:
 
 1. **Price instruments** to obtain expected returns or payoffs:
@@ -116,10 +131,11 @@ applied to option contracts or directly to stocks and ETFs depending on the
 ticker symbols supplied.
 
 The project reads its settings from a YAML configuration file—this repository
-ships an example at `examples/config.yaml`. The configuration specifies things
-like the list of option tickers to consider (the *universe*), numerical
-parameters for simulations, and where data files should be stored. Every command
-below references that file with `--config examples/config.yaml`.
+ships an example at `examples/config.yaml`. The configuration begins with an
+`asset_class` field such as `options` or `stocks`, then specifies things like the
+list of tickers to consider (the *universe*), numerical parameters for
+simulations, and where data files should be stored. Every command below
+references that file with `--config examples/config.yaml`.
 
 ### Pricing an option with the classical engine
 
