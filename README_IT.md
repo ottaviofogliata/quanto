@@ -104,9 +104,10 @@ essere applicato a contratti su opzioni o direttamente a titoli ed ETF a seconda
 forniti.
 
 Il progetto legge le impostazioni da un file di configurazione YAML—questo repository ne include uno
-di esempio in `examples/config.yaml`. La configurazione specifica elementi come la lista di ticker
-da considerare (l'*universo*), parametri numerici per le simulazioni e dove memorizzare i file di
-dati. Ogni comando menzionato sotto fa riferimento a quel file con `--config examples/config.yaml`.
+di esempio in `examples/config.yaml`. La configurazione inizia con un campo `asset_class`, ad esempio
+`options` o `stocks`, e poi specifica elementi come la lista di ticker da considerare (l'*universo*),
+parametri numerici per le simulazioni e dove memorizzare i file di dati. Ogni comando menzionato sotto
+fa riferimento a quel file con `--config examples/config.yaml`.
 
 ### Valutare un'opzione con il motore classico
 

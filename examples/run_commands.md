@@ -3,7 +3,8 @@
 This guide shows how to run the `quanto` command line interface step by step.
 It assumes you have installed the project with `poetry install` and are
 running commands from the repository root.  The sample configuration lives in
-`examples/config.yaml` and lists a small universe of optionable tickers.
+`examples/config.yaml`, begins with `asset_class: options` to set the instrument
+type, and lists a small universe of optionable tickers.
 
 > **Note**
 > The `price` command accepts any ticker symbol.  Other commands pull their
@@ -190,4 +191,3 @@ the intuition needed to explore the command line interface and the mathematics
 behind each feature.  Consult the source code and comments for more detailed
 information, and experiment with different tickers or model parameters by
 editing the configuration file.
-
