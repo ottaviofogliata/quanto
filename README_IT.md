@@ -52,6 +52,17 @@ Funzionalità opzionali:
 - Accelerazione GPU (MPS): installare `torch` con una build MPS; il codice seleziona automaticamente il dispositivo `mps` quando disponibile.
 - Strumenti quantistici: l'extra `-E quantum` installa primitive basate su Qiskit. In assenza di queste, vengono usati fallback classici.
 
+## Documentazione
+
+Il progetto utilizza [MkDocs](https://www.mkdocs.org/) per la documentazione bilingue nella cartella `doc/`. Avvia una anteprima locale con:
+
+```bash
+poetry run mkdocs serve
+```
+
+Poi apri [http://127.0.0.1:8000](http://127.0.0.1:8000) nel tuo browser per visualizzare le pagine.
+
+
 ## Notebook Jupyter
 
 La directory `notebooks/` contiene una raccolta di notebook che rispecchiano i comandi della CLI e

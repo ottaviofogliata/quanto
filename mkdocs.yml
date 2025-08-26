@@ -1,0 +1,8 @@
+site_name: Quanto Docs
+docs_dir: doc
+nav:
+  - Home: index.md
+  - Monte Carlo: monte_carlo.md
+  - Quantum Amplitude Estimation: quantum_amplitude_estimation.md
+theme:
+  name: material
