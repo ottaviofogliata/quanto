@@ -60,6 +60,17 @@ Optional features:
 - Quantum tooling: the `-E quantum` extra installs Qiskit-based primitives. When
   absent, graceful fallbacks are used.
 
+## Documentation
+
+The project uses [MkDocs](https://www.mkdocs.org/) for its bilingual documentation stored in the `doc/` folder. Launch a local preview with:
+
+```bash
+poetry run mkdocs serve
+```
+
+Then open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser to view the pages.
+
+
 ## Jupyter notebooks
 
 A collection of notebooks in the `notebooks/` directory mirrors the CLI
@@ -264,4 +275,3 @@ the intuition needed to explore the command line interface and the mathematics
 behind each feature. Consult the source code and comments for more detailed
 information, and experiment with different tickers or model parameters by
 editing the configuration file.
-
