@@ -54,7 +54,7 @@ The PnL for each step is computed as
 \(\text{PnL} = \Delta S - \text{Premium}\).
 
 ```bash
-poetry run quanto backtest --ticker SPY
+poetry run quanto backtest --ticker SPY --benchmark SPY
 ```
 
 ## Hilbert Curve Demo

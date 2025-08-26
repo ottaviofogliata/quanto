@@ -24,6 +24,7 @@ def run_backtest(
     *,
     source: str = "random",
     ticker: str | None = None,
+    benchmark: str = "SPY",
     mu: float = 0.0,
     sigma: float = 0.01,
     method: str = "classical",
@@ -40,6 +41,8 @@ def run_backtest(
     ticker : str, optional
         Single ticker symbol to backtest. Defaults to the first entry in the
         configured universe.
+    benchmark : str, optional
+        Ticker symbol used as the market benchmark for comparison.
     mu : float, optional
         Mean of the Gaussian used when ``source="random"``.
     sigma : float, optional
@@ -59,23 +62,56 @@ def run_backtest(
     )
 
     if source == "real":
+        symbols: List[str] = list(dict.fromkeys(tickers + [benchmark]))
         try:
             import importlib
+            import pandas as pd
+            import requests
 
             yf = importlib.import_module("yfinance")  # type: ignore
-        except ImportError as exc:  # pragma: no cover - dependency not available
-            raise RuntimeError(
-                "yfinance and pandas are required for real data backtests"
-            ) from exc
+            session = requests.Session()
+            session.headers["User-Agent"] = "Mozilla/5.0"
+            prices = (
+                yf.download(
+                    " ".join(symbols),
+                    period="1mo",
+                    progress=False,
+                    session=session,
+                )["Adj Close"]
+                .dropna()
+                .tail(days + 1)
+            )
+            if prices.empty:
+                raise RuntimeError("no market data returned")
+        except Exception as exc1:  # pragma: no cover - try alternate source
+            print(f"yfinance download failed ({exc1}); trying stooq")
+            try:  # pragma: no cover - network dependent
+                import pandas as pd
 
-        prices = (
-            yf.download(" ".join(tickers), period="1mo", progress=False)["Adj Close"]
-            .dropna()
-            .tail(days + 1)
-        )
-        returns = prices.pct_change().dropna().values.flatten().tolist()
-        days = len(returns)
+                frames = []
+                for symbol in symbols:
+                    url = f"https://stooq.pl/q/d/l/?s={symbol.lower()}.us&i=d"
+                    df = pd.read_csv(url, parse_dates=["Date"]).set_index("Date")
+                    frames.append(df["Close"].rename(symbol))
+                prices = (
+                    pd.concat(frames, axis=1)
+                    .dropna()
+                    .tail(days + 1)
+                )
+                if prices.empty:
+                    raise RuntimeError("no market data returned")
+            except Exception as exc2:  # pragma: no cover - propagate
+                raise RuntimeError(
+                    f"real data fetch failed via yfinance ({exc1}) and stooq ({exc2})",
+                )
+
+        strat_returns = prices[tickers[0]].pct_change().dropna().tolist()
+        bench_returns = prices[benchmark].pct_change().dropna().tolist()
+        days = min(len(strat_returns), len(bench_returns))
+        returns = strat_returns[:days]
+        benchmark_returns = bench_returns[:days]
     else:
+        benchmark_returns = [random.gauss(mu, sigma) for _ in range(days)]
         if method == "quantum":
             if (
                 QuantumCircuit is None
@@ -83,7 +119,7 @@ def run_backtest(
                 or SparsePauliOp is None
             ):
                 logger.warning(
-                    "Quantum backtest unavailable; using classical random returns."
+                    "Quantum backtest unavailable; using classical random returns.",
                 )
                 returns = [random.gauss(mu, sigma) for _ in range(days)]
             else:
@@ -101,4 +137,5 @@ def run_backtest(
             returns = [random.gauss(mu, sigma) for _ in range(days)]
 
     pnl = float(sum(returns))
-    return {"days": days, "pnl": pnl}
+    bench_pnl = float(sum(benchmark_returns))
+    return {"days": days, "pnl": pnl, "benchmark": bench_pnl}

@@ -1,11 +1,14 @@
 # Quanto
+[Leggi la traduzione completa in italiano](README_IT.md)
 
-Experimental options-trading laboratory for classical vs quantum-simulated methods.
+Experimental trading laboratory for classical vs quantum-simulated methods across
+options, stocks, and ETFs.
 
 ## Project Overview
 
 Quanto is a research playground that investigates how quantum
-algorithms might accelerate the mathematics of derivatives trading.
+algorithms might accelerate the mathematics of derivatives trading as
+well as more traditional stock and ETF strategies.
 The codebase pairs well-understood classical techniques with
 quantum-inspired counterparts so their costs and accuracy can be
 compared side by side. At its core, Quanto prices options by
@@ -22,20 +25,47 @@ portfolio optimization, risk backtesting, and other tasks relevant to
 systematic options strategies, laying the groundwork for future
 experiments on real quantum hardware.
 
-## Quickstart (macOS M3 Pro)
+## Installation and Setup
+
+These commands install dependencies and launch the tools locally. The project
+uses [Poetry](https://python-poetry.org/) for dependency management; ensure
+Python 3.11+ and Poetry are available on your system.
 
 ```bash
-# clone repository
+# clone the repository and enter it
+git clone https://github.com/your-org/quanto.git
+cd quanto
+
+# install main and development dependencies
 poetry install --with dev
+
+# optional extras for quantum algorithms
+poetry install -E quantum
+
+# run the test suite to verify the installation
+poetry run pytest
+
+# explore the command line interface
 poetry run quanto --help
+
+# launch JupyterLab to run the example notebooks
+poetry run jupyter lab
+
 ```
 
 Optional features:
 
-- GPU (MPS) acceleration: install `torch` with MPS build. The code automatically
-  selects the `mps` device when available.
-- Quantum tooling: install extras `poetry install -E quantum` to enable
-  Qiskit-based primitives. When absent, graceful fallbacks are used.
+- GPU (MPS) acceleration: install `torch` with an MPS build. The code
+  automatically selects the `mps` device when available.
+- Quantum tooling: the `-E quantum` extra installs Qiskit-based primitives. When
+  absent, graceful fallbacks are used.
+
+## Jupyter notebooks
+
+A collection of notebooks in the `notebooks/` directory mirrors the CLI
+commands and offers visual explorations. Each notebook loads the example
+configuration and produces charts or tables helpful for interactive
+analysis.
 
 ## Comprehensive Guide to the `quanto` CLI
 
@@ -43,7 +73,9 @@ This section is a friendly, self-contained tour of the `quanto` command line
 interface. It aims to give newcomers enough background to understand both the
 commands themselves and the financial or computational ideas they use. All
 examples assume that dependencies were installed with `poetry install` and that
-commands are executed from the root of the repository.
+commands are executed from the root of the repository.  Every command can be
+applied to option contracts or directly to stocks and ETFs depending on the
+ticker symbols supplied.
 
 The project reads its settings from a YAML configuration file—this repository
 ships an example at `examples/config.yaml`. The configuration specifies things
@@ -123,11 +155,84 @@ $$
 
 The resulting metrics—total return, volatility, drawdowns—give an indication of
 robustness before deploying real capital. The example command runs a backtest
-using the settings defined in the configuration file.
+using the settings defined in the configuration file and compares the results
+against a market benchmark.
 
 ```bash
-poetry run quanto backtest --config examples/config.yaml
+poetry run quanto backtest --config examples/config.yaml --ticker QQQ --benchmark SPY
 ```
+
+Add `--source real` to pull historical prices. The engine first queries Yahoo
+Finance and then retries through Stooq before raising an error if both
+sources fail. A browser-style User-Agent is sent to Yahoo Finance to reduce
+403 errors. The JSON output includes a `benchmark` field showing the cumulative
+return of the reference index over the same period:
+
+```json
+{
+  "days": 10,
+  "pnl": 0.0123,
+  "benchmark": 0.0087
+}
+```
+
+Where:
+
+- `days` is the number of trading days simulated.
+- `pnl` is the strategy's cumulative return over the period.
+- `benchmark` is the cumulative return of the chosen market index.
+
+### Quantum entanglement backtest
+
+Some market dynamics appear linked in ways that resemble quantum
+entanglement: movement in one instrument can foreshadow moves in
+another. The `entangle` command runs a quantum-inspired algorithm that
+either simulates these linkages or pulls real price data for stocks and
+ETFs. A configurable correlation strength is applied in simulation mode,
+and the routine generates a simple trading rule based on the most
+"entangled" ticker.
+
+```bash
+poetry run quanto entangle --tickers SPY,QQQ,IWM --source real --config examples/config.yaml
+```
+
+Passing `--source real` fetches historical data for the supplied tickers. The
+routine queries Yahoo Finance and then Stooq before raising an error if both
+sources are unreachable. A browser-style User-Agent is sent to Yahoo Finance to
+help avoid 403 blocks. With `--source random`, the configuration file's
+`experiment.entanglement.strength` controls the off‑diagonal correlations of the
+synthetic price paths. The command returns a JSON summary such as:
+
+```json
+{
+  "tickers": ["SPY", "QQQ", "IWM"],
+  "chosen": "SPY",
+  "entanglement": 0.714,
+  "pnl": 0.839,
+  "benchmark": 0.467,
+  "correlation_matrix": [
+    [1.0, 0.716, 0.725],
+    [0.716, 1.0, 0.700],
+    [0.725, 0.700, 1.0]
+  ]
+}
+```
+
+Here:
+
+- `tickers` lists the instruments analyzed.
+- `chosen` is the symbol with the highest average correlation to the others.
+- `entanglement` is the mean absolute off-diagonal correlation.
+- `pnl` is the cumulative return from investing solely in the `chosen` ticker.
+- `benchmark` is the return of an equal-weight portfolio of all tickers.
+- `correlation_matrix` contains the pairwise correlations between simulated
+  returns for each ticker; values near ±1 indicate strong linkage and drive the
+  entanglement heuristic.
+
+The accompanying notebook in
+`notebooks/entanglement_backtest.ipynb` visualizes the correlation matrix
+as a heatmap and plots strategy vs. benchmark performance for further
+exploration.
 
 ### Hilbert curve demonstration
 
