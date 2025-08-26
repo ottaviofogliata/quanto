@@ -52,6 +52,19 @@ Funzionalità opzionali:
 - Accelerazione GPU (MPS): installare `torch` con una build MPS; il codice seleziona automaticamente il dispositivo `mps` quando disponibile.
 - Strumenti quantistici: l'extra `-E quantum` installa primitive basate su Qiskit. In assenza di queste, vengono usati fallback classici.
 
+## Flusso tipico
+
+Una volta configurato l'ambiente, un ciclo di ricerca di base è il seguente:
+
+1. **Prezzare gli strumenti** per ottenere rendimenti o payoff attesi:
+   `poetry run quanto price --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
+2. **Ottimizzare un portafoglio** con il MILP classico o con la routine quantistica:
+   `poetry run quanto optimize --method classical --config examples/config.yaml`
+3. **Backtestare la strategia** per valutarne le prestazioni storiche:
+   `poetry run quanto backtest --config examples/config.yaml`
+
+`entangle` può essere eseguito facoltativamente prima dell'ottimizzazione per ispezionare le correlazioni tra i titoli. Modifica il file di configurazione tra un passo e l'altro per sperimentare universi o vincoli diversi.
+
 ## Documentazione
 
 Il progetto utilizza [MkDocs](https://www.mkdocs.org/) per la documentazione bilingue nella cartella `doc/`. Avvia una anteprima locale con:
@@ -143,13 +156,30 @@ ticker definito in `config.yaml` e cerca la combinazione di pesi che soddisfa al
 scelto e gli eventuali vincoli.
 
 ```bash
-poetry run quanto optimize --config examples/config.yaml
+poetry run quanto optimize --method classical --config examples/config.yaml
 ```
 
-L'ottimizzatore produce un JSON che associa a ogni ticker un peso—for example,
-`{ "SPY": 0.6, "QQQ": 0.4 }`. Ogni numero è la frazione di capitale che la
-strategia di trading deve allocare a quello strumento, fornendo una regola
-concreta per costruire il portafoglio.
+Il flag `--method` seleziona l'ottimizzatore: `classical` esegue un baseline
+MILP, mentre `quantum` mappa il problema di selezione con vincolo di budget in
+un'ottimizzazione quadratica binaria non vincolata e applica una routine in
+stile QAOA. QAOA alterna Hamiltoniane del problema e di mixing in un piccolo
+circuito parametrizzato; un ottimizzatore classico regola gli angoli affinché il
+circuito approssimi il portafoglio ottimale. In assenza delle librerie
+quantistiche, il comando ricade su un annealing simulato. Un esempio di
+risposta è:
+
+```json
+{
+  "selection": [0, 1],
+  "method": "milp"
+}
+```
+
+`selection` elenca gli strumenti scelti per indice e `method` indica quale
+ottimizzatore ha generato il risultato.
+
+Per un'analisi più approfondita della routine quantistica, consulta la
+[documentazione sull'ottimizzazione QAOA del portafoglio](doc/qaoa_portfolio.md).
 
 ### Backtesting della strategia
 
@@ -266,4 +296,3 @@ Questo progetto utilizza massicciamente l'IA e gli agenti per automatizzare rice
 linee guida per questi agenti sono definite in [AGENTS.md](https://agents.md), una specifica che
 spiega come le istruzioni specifiche del repository aiutino i contributori automatizzati a mantenere
 coerenza e qualità.
-

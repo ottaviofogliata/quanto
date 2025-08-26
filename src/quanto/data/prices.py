@@ -1,6 +1,6 @@
-from __future__ import annotations
-
 """Price data retrieval strategies."""
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import List, Protocol
@@ -30,7 +30,7 @@ class YFinanceSource:
 
     def fetch(self, symbols: List[str], period: str, days: int) -> pd.DataFrame:
         import importlib
-        import requests
+        import requests  # type: ignore[import-untyped]
 
         yf = importlib.import_module("yfinance")  # type: ignore
         session = requests.Session()
@@ -56,7 +56,9 @@ class StooqSource:
 
     name: str = "stooq"
 
-    def fetch(self, symbols: List[str], period: str, days: int) -> pd.DataFrame:  # noqa: D401
+    def fetch(
+        self, symbols: List[str], period: str, days: int
+    ) -> pd.DataFrame:  # noqa: D401
         frames = []
         for symbol in symbols:
             url = f"https://stooq.pl/q/d/l/?s={symbol.lower()}.us&i=d"

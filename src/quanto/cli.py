@@ -38,11 +38,15 @@ def price(
 @app.command()
 def optimize(
     config: Path = typer.Option(Path("examples/config.yaml")),
+    method: str = typer.Option("quantum", help="classical|quantum"),
 ) -> None:
     cfg = load_config(config)
-    res = qaoa.optimize(cfg)
-    if not res:
+    if method == "classical":
         res = milp.optimize(cfg)
+    else:
+        res = qaoa.optimize(cfg)
+        if not res:
+            res = milp.optimize(cfg)
     typer.echo(json.dumps(res, indent=2))
 
 
