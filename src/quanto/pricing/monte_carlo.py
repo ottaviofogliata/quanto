@@ -43,8 +43,22 @@ def price(ticker: str, dte: int, strike: str, cfg) -> Dict[str, float | str]:
     """Price an option via Monte Carlo."""
     manual_seed(0)  # ensure reproducible runs for tests and examples
     S0 = 100.0  # spot price placeholder
-    # Support expressions such as ``-5%`` to denote OTM strikes
-    K = S0 * (1 - 0.05) if strike.startswith("-") else S0
+    # Support a range of strike expressions like "-5%", "+5%", "ATM" or
+    # absolute numeric strikes.  Anything unrecognised defaults to at-the-money.
+    expr = strike.strip().upper()
+    if expr == "ATM":
+        K = S0
+    elif expr.endswith("%"):
+        try:
+            pct = float(expr.strip("%")) / 100.0
+            K = S0 * (1 + pct)
+        except ValueError:
+            K = S0
+    else:
+        try:
+            K = float(expr)
+        except ValueError:
+            K = S0
     r = 0.01  # risk-free rate
     sigma = 0.2  # volatility
     T = dte / 365  # convert days-to-expiry to years
