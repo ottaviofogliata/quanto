@@ -3,6 +3,8 @@ from __future__ import annotations
 import numpy as np
 from typing import List, Dict, Any
 
+from ..data.prices import fetch_prices
+
 
 def run_entanglement_backtest(
     cfg: Any,
@@ -45,59 +47,14 @@ def run_entanglement_backtest(
 
     returns = None
     if source == "real":
-        try:  # pragma: no cover - network dependent
-            import importlib
-            import pandas as pd
-            import requests
-
-            yf = importlib.import_module("yfinance")  # type: ignore[import-untyped]
-            session = requests.Session()
-            session.headers["User-Agent"] = "Mozilla/5.0"
-            prices = (
-                yf.download(
-                    " ".join(tickers),
-                    period="1y",
-                    progress=False,
-                    session=session,
-                )["Adj Close"]
-                .dropna()
-                .tail(days + 1)
-            )
-            if prices.empty:
-                raise RuntimeError("no market data returned")
-            returns = prices.pct_change().dropna().T.values  # shape (n, days)
-            days = returns.shape[1]
-        except Exception as exc1:  # pragma: no cover - try alternate source
-            print(f"yfinance download failed ({exc1}); trying stooq")
-            try:  # pragma: no cover - network dependent
-                import pandas as pd
-
-                frames = []
-                for symbol in tickers:
-                    url = f"https://stooq.pl/q/d/l/?s={symbol.lower()}.us&i=d"
-                    df = pd.read_csv(url, parse_dates=["Date"]).set_index("Date")
-                    frames.append(df["Close"].rename(symbol))
-                prices = (
-                    pd.concat(frames, axis=1)
-                    .dropna()
-                    .tail(days + 1)
-                )
-                if prices.empty:
-                    raise RuntimeError("no market data returned")
-                returns = prices.pct_change().dropna().T.values
-                days = returns.shape[1]
-            except Exception as exc2:  # pragma: no cover - propagate
-                raise RuntimeError(
-                    f"real data fetch failed via yfinance ({exc1}) and stooq ({exc2})",
-                )
+        prices = fetch_prices(tickers, period="1y", days=days)
+        returns = prices.pct_change().dropna().T.values  # shape (n, days)
+        days = returns.shape[1]
 
     if returns is None:
         # Configurable correlation strength between instruments
-        strength = (
-            cfg.experiment.get("entanglement", {}).get("strength", 0.5)
-            if hasattr(cfg, "experiment")
-            else 0.5
-        )
+        exp_cfg = getattr(cfg, "experiment", {}) or {}
+        strength = exp_cfg.get("entanglement", {}).get("strength", 0.5)
 
         rng = np.random.default_rng(0)
 
