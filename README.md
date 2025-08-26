@@ -1,5 +1,6 @@
 # Quanto
-[Read the complete Italian translation](README_IT.md)
+
+This README has a complete [Italian translation](README_IT.md).
 
 Experimental trading laboratory for classical vs quantum-simulated methods across
 options, stocks, and ETFs.
@@ -72,10 +73,24 @@ Optional features:
 
 ## Typical workflow
 
+Before running commands, choose the asset class with `--asset-class options` for
+option contracts or `--asset-class stocks` for equities and ETFs.
+
+```bash
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml
+# {"price": 5.624190052301251, "device": "cpu"}
+
+poetry run quanto price --asset-class stocks --ticker SPY --config examples/config.yaml
+# {"price": 500.12, "device": "cpu"}
+```
+
+In both cases, `price` is the option premium or share price, and `device` notes
+the compute backend.
+
 Once the environment is set up, a basic research cycle looks like this:
 
 1. **Price instruments** to obtain expected returns or payoffs:
-   `poetry run quanto price --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
+   `poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
 2. **Optimize a portfolio** with either the classical MILP or the quantum
    routine:
    `poetry run quanto optimize --method classical --config examples/config.yaml`
