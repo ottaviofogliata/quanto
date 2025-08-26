@@ -27,9 +27,6 @@ def price(
     dte: int = typer.Option(0, help="Days to expiry"),
     strike: str = typer.Option("", help="Strike expression e.g. -5%"),
     method: str = typer.Option("classical", help="classical|quantum"),
-    asset_class: Optional[str] = typer.Option(
-        None, help="Asset class, e.g. options or stocks"
-    ),
     config: Path = typer.Option(Path("examples/config.yaml")),
 ) -> None:
     cfg = load_config(config)
