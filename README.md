@@ -275,3 +275,11 @@ the intuition needed to explore the command line interface and the mathematics
 behind each feature. Consult the source code and comments for more detailed
 information, and experiment with different tickers or model parameters by
 editing the configuration file.
+
+---
+
+This project uses AI and agents extensively to automate research and development.
+Guidelines for these agents are defined in [AGENTS.md](https://agents.md), a
+specification that explains how repository-specific instructions help AI
+contributors maintain consistency and quality.
+

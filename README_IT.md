@@ -183,3 +183,11 @@ Qui:
   l'euristica di entanglement.
 
 Il notebook corrispondente in `notebooks/entanglement_backtest.ipynb` visualizza la matrice di correlazione come heatmap e traccia l'andamento della strategia rispetto al benchmark per ulteriori esplorazioni.
+
+
+---
+
+Questo progetto utilizza massicciamente l'IA e gli agenti per automatizzare ricerca e sviluppo.
+Le linee guida per questi agenti sono definite in [AGENTS.md](https://agents.md), una
+specifica che spiega come le istruzioni specifiche del repository aiutino i contributori automatizzati a mantenere coerenza e qualità.
+
