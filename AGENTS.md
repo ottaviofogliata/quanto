@@ -4,6 +4,21 @@
 - Build a quantum-enhanced trading toolkit that works with options, stocks, and ETFs.
 - Strategies should aim to beat benchmark market returns ("win the market").
 
+## Getting Started
+- Ensure Python 3.11+ and [Poetry](https://python-poetry.org/) are installed.
+- Install dependencies and dev tools: `poetry install --with dev`.
+- Optional quantum extras: `poetry install -E quantum`.
+- Explore the CLI: `poetry run quanto --help`.
+- Run tests to verify the environment: `poetry run pytest`.
+
+## CLI Commands
+- `poetry run quanto price --ticker SPY --dte 30 --strike "-5%" --config examples/config.yaml` – price options or tickers with classical and quantum-simulated engines.
+- `poetry run quanto optimize --config examples/config.yaml` – optimize portfolios with classical or quantum algorithms.
+- `poetry run quanto backtest --config examples/config.yaml` – evaluate strategies against a benchmark.
+- `poetry run quanto entangle --tickers SPY,QQQ,IWM --config examples/config.yaml` – analyze entanglement-style correlations between tickers.
+- `poetry run quanto hilbert-demo --config examples/config.yaml` – demonstrate Hilbert curve mappings.
+- Update this list whenever new commands or setup steps are introduced.
+
 ## Documentation
 - Maintain `README.md` and `README_IT.md` as 1:1 translations.
 - Any change in one README must be mirrored in the other, and each README must link to the other.
