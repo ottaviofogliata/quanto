@@ -102,6 +102,11 @@ un moto browniano geometrico.
 poetry run quanto price --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
 ```
 
+Il comando stampa un oggetto JSON come `{ "price": 1.23, "device": "cpu" }`.
+Qui `price` è il premio equo da pagare o ricevere per l'opzione secondo questo
+modello, mentre `device` indica il backend numerico (NumPy o Torch) usato per
+simulare i percorsi.
+
 ### Valutare un'opzione con il motore quantistico simulato
 
 L'amplitude estimation quantistica può accelerare quadraticamente il Monte Carlo riducendo il numero
@@ -118,6 +123,11 @@ potrebbero migliorare l'efficienza nelle future generazioni di hardware.
 ```bash
 poetry run quanto price --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
 ```
+
+L'output rispecchia il comando classico, restituendo campi come
+`{ "price": 1.20, "device": "qiskit_simulator" }`. Il valore `price` rappresenta
+ancora il premio modellizzato dell'opzione e `device` identifica il simulatore
+che fornisce la stima così da confrontare direttamente i due approcci.
 
 ### Ottimizzazione di portafoglio
 
@@ -136,11 +146,20 @@ scelto e gli eventuali vincoli.
 poetry run quanto optimize --config examples/config.yaml
 ```
 
+L'ottimizzatore produce un JSON che associa a ogni ticker un peso—for example,
+`{ "SPY": 0.6, "QQQ": 0.4 }`. Ogni numero è la frazione di capitale che la
+strategia di trading deve allocare a quello strumento, fornendo una regola
+concreta per costruire il portafoglio.
+
 ### Backtesting della strategia
 
-Il backtesting rigioca una strategia su dati storici per verificarne la performance. Dato un modello
-di pricing $P$ e una regola di trading $R$, il motore percorre gli stati di mercato passati
-$\{S_t\}$ e registra profitti e perdite ipotetici
+Il backtesting rigioca una strategia di trading su dati storici per verificarne
+la performance. Una strategia combina un modello di pricing $P$ con una regola di
+trading $R$: un insieme di istruzioni su quando comprare, vendere o mantenere
+posizioni in base allo stato di mercato osservato $S_t$. Il motore attraversa gli
+stati di mercato passati $\{S_t\}$, applica $R$ per decidere la posizione,
+sottrae il prezzo del modello $P(S_t)$ come costo dell'operazione e accumula i
+profitti e le perdite risultanti
 
 $$ \text{PnL} = \sum_t R(S_t) - P(S_t). $$
 
@@ -177,7 +196,9 @@ Alcune dinamiche di mercato sembrano collegate in modi che ricordano l'entanglem
 movimento di uno strumento può preannunciare quello di un altro. Il comando `entangle` esegue un
 algoritmo ispirato al quantum che può simulare questi legami oppure scaricare dati reali per azioni
 ed ETF. In modalità simulata applica una forza di correlazione configurabile e genera una semplice
-regola di trading basata sul ticker più "entangled".
+regola di trading basata sul ticker più "entangled". La regola è diretta: investire
+tutto il capitale nello strumento con la correlazione media più alta rispetto agli
+altri e mantenere la posizione per l'intera finestra di test.
 
 ```bash
 poetry run quanto entangle --tickers SPY,QQQ,IWM --source real --config examples/config.yaml

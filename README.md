@@ -115,6 +115,11 @@ pricing model draws random paths under a geometric Brownian motion assumption.
 poetry run quanto price --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
 ```
 
+The command prints a JSON object such as `{ "price": 1.23, "device": "cpu" }`.
+Here `price` is the fair premium you would pay or receive for the option under
+this model, while `device` records the numerical backend (NumPy or Torch) used
+to simulate the paths.
+
 ### Pricing an option with the quantum-simulated engine
 
 Quantum amplitude estimation can quadratically speed up Monte Carlo by reducing
@@ -132,6 +137,11 @@ how quantum techniques might improve efficiency in future hardware generations.
 ```bash
 poetry run quanto price --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
 ```
+
+Its output mirrors the classical command, returning fields like
+`{ "price": 1.20, "device": "qiskit_simulator" }`.  The `price` value again
+represents the modeled option premium, and `device` identifies the simulator
+providing the estimate so the two approaches can be compared directly.
 
 ### Portfolio optimization
 
@@ -153,12 +163,19 @@ weights that best satisfies the chosen objective and any side constraints.
 poetry run quanto optimize --config examples/config.yaml
 ```
 
+The optimizer emits a JSON mapping tickers to weights—for example,
+`{ "SPY": 0.6, "QQQ": 0.4 }`.  Each number is the fraction of capital the
+trading strategy should allocate to that instrument, providing a concrete rule
+for constructing the portfolio.
+
 ### Backtesting the strategy
 
-Backtesting replays a strategy on historical data to see how it would have
-performed. Given an option-pricing model $P$ and a trading rule $R$, the engine
-iterates through past market states $\{S_t\}$ and records hypothetical profit
-and loss
+Backtesting replays a trading strategy on historical data to see how it would
+have performed. A strategy combines an option-pricing model $P$ with a trading
+rule $R$—a set of instructions for when to buy, sell, or hold positions based on
+the observed market state $S_t$. The engine walks through past market states
+$\{S_t\}$, applies $R$ to decide the position, subtracts the model price
+$P(S_t)$ as the trade's cost, and accumulates the resulting profit and loss
 
 $$
 \text{PnL} = \sum_t R(S_t) - P(S_t).
@@ -201,7 +218,9 @@ another. The `entangle` command runs a quantum-inspired algorithm that
 either simulates these linkages or pulls real price data for stocks and
 ETFs. A configurable correlation strength is applied in simulation mode,
 and the routine generates a simple trading rule based on the most
-"entangled" ticker.
+"entangled" ticker. The rule is straightforward: invest all capital in the
+instrument with the highest average correlation to the others and hold that
+position for the test window.
 
 ```bash
 poetry run quanto entangle --tickers SPY,QQQ,IWM --source real --config examples/config.yaml
