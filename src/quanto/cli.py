@@ -12,6 +12,7 @@ from .config import load_config
 from .pricing import monte_carlo, quantum_qae
 from .optimize import milp, qaoa
 from .portfolio import hilbert
+from .entangle import run_entanglement_backtest
 from .utils.logging import get_logger
 
 app = typer.Typer(add_completion=False)
@@ -49,6 +50,7 @@ def optimize(
 def backtest(
     config: Path = typer.Option(Path("examples/config.yaml")),
     ticker: str = typer.Option("SPY", help="Ticker symbol to backtest"),
+    benchmark: str = typer.Option("SPY", help="Benchmark ticker symbol"),
     source: str = typer.Option("random", help="real|random"),
     mu: float = typer.Option(0.0, help="Mean for random.gauss"),
     sigma: float = typer.Option(0.01, help="Std dev for random.gauss"),
@@ -58,9 +60,29 @@ def backtest(
     from .backtest.engine import run_backtest
 
     summary = run_backtest(
-        cfg, source=source, ticker=ticker, mu=mu, sigma=sigma, method=method
+        cfg,
+        source=source,
+        ticker=ticker,
+        benchmark=benchmark,
+        mu=mu,
+        sigma=sigma,
+        method=method,
     )
     typer.echo(json.dumps(summary, indent=2))
+
+
+@app.command()
+def entangle(
+    config: Path = typer.Option(Path("examples/config.yaml")),
+    tickers: str = typer.Option("SPY,QQQ", help="Comma-separated tickers"),
+    days: int = typer.Option(252, help="Trading days to simulate"),
+    source: str = typer.Option("random", help="real|random"),
+) -> None:
+    """Backtest a toy quantum-inspired entanglement between instruments."""
+    cfg = load_config(config)
+    syms = [t.strip() for t in tickers.split(",") if t.strip()]
+    res = run_entanglement_backtest(cfg, syms, days=days, source=source)
+    typer.echo(json.dumps(res, indent=2))
 
 
 @app.command(name="hilbert-demo")

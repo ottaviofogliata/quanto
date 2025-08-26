@@ -50,3 +50,5 @@ experiment:
       test_days: 63
     validation: "purged_kfold"
     embargo_days: 5
+  entanglement:
+    strength: 0.7    # off-diagonal correlation used in entanglement backtests
