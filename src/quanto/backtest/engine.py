@@ -55,6 +55,8 @@ def run_backtest(
     if ticker:
         tickers = [ticker]
 
+    # Determine the test window from the configuration.  Defaults to 10 days
+    # if the nested keys are absent.
     days = (
         cfg.experiment.get("backtest", {})
         .get("walk_forward", {})
@@ -64,6 +66,8 @@ def run_backtest(
     if source == "real":
         symbols: List[str] = list(dict.fromkeys(tickers + [benchmark]))
         try:
+            # Primary data source: yfinance.  A custom session header avoids
+            # occasional HTTP 403 errors when running in CI.
             import importlib
             import pandas as pd
             import requests
@@ -84,6 +88,7 @@ def run_backtest(
             if prices.empty:
                 raise RuntimeError("no market data returned")
         except Exception as exc1:  # pragma: no cover - try alternate source
+            # Fall back to the stooq dataset when yfinance is unavailable.
             print(f"yfinance download failed ({exc1}); trying stooq")
             try:  # pragma: no cover - network dependent
                 import pandas as pd
@@ -118,11 +123,13 @@ def run_backtest(
                 or Estimator is None
                 or SparsePauliOp is None
             ):
+                # If qiskit is missing fall back to classical randomness
                 logger.warning(
                     "Quantum backtest unavailable; using classical random returns.",
                 )
                 returns = [random.gauss(mu, sigma) for _ in range(days)]
             else:
+                # Map classical Gaussian draws to quantum expectation values.
                 op = SparsePauliOp("Z")
                 est = Estimator()
                 returns = []

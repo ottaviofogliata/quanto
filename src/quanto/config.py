@@ -42,5 +42,7 @@ def load_config(path: str | Path) -> ExperimentConfig:
         for line in text.splitlines():
             if ":" in line:
                 k, v = line.split(":", 1)
+                # ``eval`` here is intentionally simplistic; the fallback is only
+                # used in environments where a full YAML parser is unavailable.
                 data[k.strip()] = eval(v.strip()) if v.strip() else None
     return ExperimentConfig.model_validate(data)

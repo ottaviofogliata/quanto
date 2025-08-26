@@ -25,6 +25,7 @@ class HilbertPortfolio:
         norm = np.linalg.norm(amps)
         if norm == 0:
             raise ValueError("Zero vector")
+        # Normalise amplitudes so the state has unit length
         self.amplitudes = amps / norm
 
     def expectation(self, operator: np.ndarray) -> float:
@@ -33,11 +34,13 @@ class HilbertPortfolio:
 
     def project(self, indices: Iterable[int]) -> "HilbertPortfolio":
         idx = list(indices)
+        # Select only the requested basis states and renormalise via __post_init__
         new_basis = [self.basis[i] for i in idx]
         new_amps = self.amplitudes[idx]
         return HilbertPortfolio(new_basis, new_amps)
 
     def probs(self) -> np.ndarray:
+        # Probability of each basis state is the squared magnitude of amplitude
         return np.abs(self.amplitudes) ** 2
 
     def pretty(self) -> str:

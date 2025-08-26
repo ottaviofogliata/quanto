@@ -10,7 +10,10 @@ except Exception:  # pragma: no cover - torch optional
     torch = None  # type: ignore
 
 
+# Assume a 36GB memory ceiling when estimating safe state-vector allocations
 TOTAL_MEMORY_BYTES = 36 * 1024**3
+# Only allow allocations up to 60% of the presumed total to leave headroom for
+# the rest of the process and system
 SAFE_FRACTION = 0.6
 
 
