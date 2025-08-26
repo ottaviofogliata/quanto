@@ -14,8 +14,11 @@ except Exception:  # pragma: no cover
     cp = None  # type: ignore
 
 
-def optimize(cfg) -> Dict[str, Any]:
+def optimize(cfg, asset_class: str | None = None) -> Dict[str, Any]:
     """Simple MILP selecting contracts by EV subject to budget."""
+    exp_cfg = getattr(cfg, "experiment", {}) or {}
+    if asset_class in {"stocks", "options"} and not exp_cfg.get("universe"):
+        raise ValueError(f"Tickers required for asset_class '{asset_class}'")
     if cp is None:
         logger.warning("cvxpy unavailable; using greedy fallback")
         ev = [5, 4, 3]

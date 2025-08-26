@@ -1,3 +1,5 @@
+import pytest
+
 from quanto.optimize import milp, qaoa
 from quanto.config import ExperimentConfig
 
@@ -12,3 +14,13 @@ def test_milp():
 def test_qaoa():
     res = qaoa.optimize(CFG)
     assert isinstance(res["selection"], list)
+
+
+def test_milp_missing_tickers_stocks():
+    with pytest.raises(ValueError):
+        milp.optimize(CFG, asset_class="stocks")
+
+
+def test_milp_missing_tickers_options():
+    with pytest.raises(ValueError):
+        milp.optimize(CFG, asset_class="options")

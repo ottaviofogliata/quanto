@@ -90,3 +90,33 @@ def test_backtest_sets_user_agent(monkeypatch):
     res = run_backtest(cfg, source="real", benchmark="QQQ")
     assert res["days"] == 2
     assert captured["ua"].startswith("Mozilla/")
+
+
+@pytest.mark.parametrize("asset_class", ["stocks", "options"])
+def test_backtest_random_asset_class(asset_class):
+    cfg = ExperimentConfig.model_validate({"experiment": {"universe": ["SPY"]}})
+    res = run_backtest(cfg, source="random", asset_class=asset_class)
+    assert res["days"] == 10
+    assert isinstance(res["pnl"], float)
+
+
+@pytest.mark.parametrize("asset_class", ["stocks", "options"])
+def test_backtest_real_asset_class(monkeypatch, asset_class):
+    cfg = ExperimentConfig.model_validate({"experiment": {"universe": ["SPY"]}})
+
+    def fake_download(*args, **kwargs):
+        dates = pd.date_range("2023-01-01", periods=5, freq="D")
+        tuples = [("Adj Close", "SPY"), ("Adj Close", "QQQ")]
+        index = pd.MultiIndex.from_tuples(tuples)
+        data = pd.DataFrame(
+            [[1, 1], [1.01, 1.02], [1.02, 1.04], [1.03, 1.06], [1.04, 1.08]],
+            index=dates,
+            columns=index,
+        )
+        return data
+
+    fake_yf = types.SimpleNamespace(download=fake_download)
+    monkeypatch.setitem(sys.modules, "yfinance", fake_yf)
+
+    res = run_backtest(cfg, source="real", benchmark="QQQ", asset_class=asset_class)
+    assert "pnl" in res
