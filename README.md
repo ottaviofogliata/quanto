@@ -55,10 +55,20 @@ poetry run jupyter lab
 
 Optional features:
 
-- GPU (MPS) acceleration: install `torch` with an MPS build. The code
-  automatically selects the `mps` device when available.
-- Quantum tooling: the `-E quantum` extra installs Qiskit-based primitives. When
-  absent, graceful fallbacks are used.
+- GPU (MPS) acceleration: install `torch` with an MPS build:
+
+  ```bash
+  pip install torch torchvision torchaudio -f https://download.pytorch.org/whl/metal.html
+  ```
+
+  The code automatically selects the `mps` device when available.
+- Quantum tooling: install Qiskit-based primitives with:
+
+  ```bash
+  poetry install -E quantum
+  ```
+
+  When absent, graceful fallbacks are used.
 
 ## Documentation
 
