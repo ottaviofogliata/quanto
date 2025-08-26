@@ -23,4 +23,6 @@
 ## Development
 - Implement algorithms abstractly so they apply to options, stocks, and ETFs.
 - Explore and integrate quantum techniques (such as entanglement-based analysis) for pricing, backtesting, and prediction.
+- Run tests and linters for every code change 
+- For each change, remember to run the main commands and keep the notebooks that use those libraries up to date.
 - Keep this `AGENTS.md` up to date as project goals evolve.
