@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any, Dict
+from ast import literal_eval
 
 try:
     import yaml  # type: ignore[import-not-found]
@@ -42,7 +43,14 @@ def load_config(path: str | Path) -> ExperimentConfig:
         for line in text.splitlines():
             if ":" in line:
                 k, v = line.split(":", 1)
-                # ``eval`` here is intentionally simplistic; the fallback is only
-                # used in environments where a full YAML parser is unavailable.
-                data[k.strip()] = eval(v.strip()) if v.strip() else None
+                v = v.strip()
+                if not v:
+                    data[k.strip()] = None
+                    continue
+                try:
+                    # ``literal_eval`` avoids executing arbitrary code while still
+                    # handling basic Python literals in the fallback parser.
+                    data[k.strip()] = literal_eval(v)
+                except Exception:
+                    data[k.strip()] = v
     return ExperimentConfig.model_validate(data)
