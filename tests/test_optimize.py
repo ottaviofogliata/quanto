@@ -11,6 +11,20 @@ def test_milp():
     assert isinstance(res["selection"], list)
 
 
+def test_milp_stocks(monkeypatch):
+    cfg = ExperimentConfig.model_validate({"experiment": {"constraints": {"budget": 1500}}})
+
+    def fake_fetch(symbols, period, days, sources=None):
+        import pandas as pd
+
+        data = {sym: [1.0, 1.1] for sym in symbols}
+        return pd.DataFrame(data)
+
+    monkeypatch.setattr(milp, "fetch_prices", fake_fetch)
+    res = milp.optimize(cfg, asset_class="stocks", tickers=["AAPL"])
+    assert isinstance(res["selection"], list)
+
+
 def test_qaoa():
     res = qaoa.optimize(CFG)
     assert isinstance(res["selection"], list)

@@ -29,7 +29,7 @@ def run_backtest(
     mu: float = 0.0,
     sigma: float = 0.01,
     method: str = "classical",
-    asset_class: str | None = None,
+    asset_class: str = "options",
 ) -> Dict[str, float]:
     """Run a naive backtest on either real or simulated data.
 
@@ -54,13 +54,14 @@ def run_backtest(
     """
 
     exp_cfg = getattr(cfg, "experiment", {}) or {}
-    tickers: List[str] = exp_cfg.get("universe", [])
-    if ticker:
-        tickers = [ticker]
-    if asset_class in {"stocks", "options"} and not tickers:
-        raise ValueError(f"Tickers required for asset_class '{asset_class}'")
-    if not tickers:
-        tickers = ["SPY"]
+    if asset_class == "stocks":
+        if not ticker:
+            raise ValueError("ticker required for stock backtest")
+        tickers: List[str] = [ticker]
+    else:
+        tickers = exp_cfg.get("universe", ["SPY"])
+        if ticker:
+            tickers = [ticker]
 
     # Determine the test window from the configuration.  Defaults to 10 days
     # if the nested keys are absent.

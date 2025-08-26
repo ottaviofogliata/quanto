@@ -23,6 +23,12 @@ def test_backtest_quantum():
     assert isinstance(res["benchmark"], float)
 
 
+def test_backtest_stocks_branch():
+    cfg = ExperimentConfig.model_validate({"experiment": {}})
+    res = run_backtest(cfg, source="random", asset_class="stocks", ticker="SPY")
+    assert res["days"] == 10
+
+
 def test_backtest_real_data_stooq(monkeypatch):
     cfg = ExperimentConfig.model_validate({"experiment": {"universe": ["SPY"]}})
 

@@ -91,11 +91,12 @@ Once the environment is set up, a basic research cycle looks like this:
 
 1. **Price instruments** to obtain expected returns or payoffs:
    `poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
+   For equities, specify `--asset-class stocks --ticker AAPL` to fetch the latest share price.
 2. **Optimize a portfolio** with either the classical MILP or the quantum
    routine:
-   `poetry run quanto optimize --method classical --config examples/config.yaml`
+   `poetry run quanto optimize --asset-class options --method classical --config examples/config.yaml`
 3. **Backtest the strategy** to gauge historical performance:
-   `poetry run quanto backtest --config examples/config.yaml`
+   `poetry run quanto backtest --asset-class options --config examples/config.yaml`
 
 `entangle` can optionally be run before optimization to inspect correlations
 between tickers. Adjust the configuration file between steps to experiment with
@@ -154,7 +155,7 @@ The command below prices a SPY put option that is five percent out of the money
 pricing model draws random paths under a geometric Brownian motion assumption.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
 ```
 
 The command prints a JSON object such as `{ "price": 1.23, "device": "cpu" }`.
@@ -177,7 +178,7 @@ simulation engine. Comparing its output with the classical engine illustrates
 how quantum techniques might improve efficiency in future hardware generations.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
 ```
 
 Its output mirrors the classical command, returning fields like
@@ -202,7 +203,7 @@ universe of tickers defined in `config.yaml` and searches for the combination of
 weights that best satisfies the chosen objective and any side constraints.
 
 ```bash
-poetry run quanto optimize --method classical --config examples/config.yaml
+poetry run quanto optimize --asset-class options --method classical --config examples/config.yaml
 ```
 
 The `--method` flag selects the optimizer: `classical` runs a MILP baseline,
@@ -245,14 +246,15 @@ using the settings defined in the configuration file and compares the results
 against a market benchmark.
 
 ```bash
-poetry run quanto backtest --config examples/config.yaml --ticker QQQ --benchmark SPY
+poetry run quanto backtest --asset-class options --tickers QQQ --benchmark SPY --config examples/config.yaml
 ```
 
 Add `--source real` to pull historical prices. The engine first queries Yahoo
 Finance and then retries through Stooq before raising an error if both
 sources fail. A browser-style User-Agent is sent to Yahoo Finance to reduce
-403 errors. The JSON output includes a `benchmark` field showing the cumulative
-return of the reference index over the same period:
+403 errors. The JSON output includes fields like `days` (trading window),
+`pnl` (cumulative profit and loss), and `benchmark` (market return) over the
+same period:
 
 ```json
 {

@@ -1,6 +1,6 @@
 # Quanto
 
-[Versione originale in inglese](README.md)
+[Versione originale in inglese](README.md) – questa è una traduzione completa del README inglese.
 
 Questo README è la traduzione completa del file in inglese.
 
@@ -86,10 +86,11 @@ Una volta configurato l'ambiente, un ciclo di ricerca di base è il seguente:
 
 1. **Prezzare gli strumenti** per ottenere rendimenti o payoff attesi:
    `poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --config examples/config.yaml`
+   Per le azioni specificare `--asset-class stocks --ticker AAPL` per ottenere l'ultimo prezzo.
 2. **Ottimizzare un portafoglio** con il MILP classico o con la routine quantistica:
-   `poetry run quanto optimize --method classical --config examples/config.yaml`
+   `poetry run quanto optimize --asset-class options --method classical --config examples/config.yaml`
 3. **Backtestare la strategia** per valutarne le prestazioni storiche:
-   `poetry run quanto backtest --config examples/config.yaml`
+   `poetry run quanto backtest --asset-class options --config examples/config.yaml`
 
 `entangle` può essere eseguito facoltativamente prima dell'ottimizzazione per ispezionare le correlazioni tra i titoli. Modifica il file di configurazione tra un passo e l'altro per sperimentare universi o vincoli diversi.
 
@@ -141,7 +142,7 @@ e trenta giorni alla scadenza (`--dte 30`). Il modello di default simula percors
 un moto browniano geometrico.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --method classical --config examples/config.yaml
 ```
 
 Il comando stampa un oggetto JSON come `{ "price": 1.23, "device": "cpu" }`.
@@ -163,7 +164,7 @@ Confrontare il suo output con quello del motore classico illustra come le tecnic
 potrebbero migliorare l'efficienza nelle future generazioni di hardware.
 
 ```bash
-poetry run quanto price --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
+poetry run quanto price --asset-class options --ticker SPY --dte 30 --strike -5% --method quantum --config examples/config.yaml
 ```
 
 L'output rispecchia il comando classico, restituendo campi come
@@ -185,7 +186,7 @@ ticker definito in `config.yaml` e cerca la combinazione di pesi che soddisfa al
 scelto e gli eventuali vincoli.
 
 ```bash
-poetry run quanto optimize --method classical --config examples/config.yaml
+poetry run quanto optimize --asset-class options --method classical --config examples/config.yaml
 ```
 
 Il flag `--method` seleziona l'ottimizzatore: `classical` esegue un baseline
@@ -227,13 +228,14 @@ robustezza prima di impiegare capitale reale. Il comando di esempio esegue un ba
 impostazioni definite nel file di configurazione e confronta i risultati con un indice di mercato.
 
 ```bash
-poetry run quanto backtest --config examples/config.yaml --ticker QQQ --benchmark SPY
+poetry run quanto backtest --asset-class options --tickers QQQ --benchmark SPY --config examples/config.yaml
 ```
 
 Aggiungi `--source real` per scaricare i prezzi storici. Il motore interroga prima Yahoo Finance e
 poi Stooq, sollevando un errore se entrambe le fonti falliscono. Viene inviato un User-Agent in
-stile browser a Yahoo Finance per ridurre gli errori 403. L'output JSON include un campo `benchmark`
-che mostra il rendimento cumulato dell'indice di riferimento sullo stesso periodo:
+stile browser a Yahoo Finance per ridurre gli errori 403. L'output JSON include campi come `days`
+(giorni di trading), `pnl` (profitto/perdita cumulativo) e `benchmark` (rendimento di mercato) sullo
+stesso periodo:
 
 ```json
 {
