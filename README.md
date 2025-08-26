@@ -1,5 +1,5 @@
 # Quanto
-[Leggi la traduzione completa in italiano](README_IT.md)
+[Read the complete Italian translation](README_IT.md)
 
 Experimental trading laboratory for classical vs quantum-simulated methods across
 options, stocks, and ETFs.
