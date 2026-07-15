@@ -1,5 +1,7 @@
 # Quanto
 
+**Questo progetto è puramente sperimentale e, per questo motivo, è pieno di errori, difetti e elementi casuali inseriti a caso. È una tela bianca su cui ho annotato alcune idee per trarne delle conclusioni preliminari**.
+
 [Versione originale in inglese](README.md) – questa è una traduzione completa del README inglese.
 
 Questo README è la traduzione completa del file in inglese.
