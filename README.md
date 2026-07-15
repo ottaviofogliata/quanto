@@ -1,5 +1,7 @@
 # Quanto
 
+**This project is purely experimental and, for that reason, full of errors, glitches, and random stuff thrown in. It’s a blank canvas on which I’ve recorded some ideas in order to draw some preliminary conclusions from them**.
+
 This README has a complete [Italian translation](README_IT.md).
 
 Experimental trading laboratory for classical vs quantum-simulated methods across
